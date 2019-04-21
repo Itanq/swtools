@@ -11,11 +11,13 @@ Can be used to share transfer files on a local LAN!
 
 ## Usages:
 
-Get the swtools.exe execution file, prepare a config.json, there are three item:
+Get the swtools.exe execution file, prepare a configuration file config.json in the directory where swtools.exe is located, there are three item:
 
-*path:* the director that you want to share.
-*localhost:* the ip address that you pc.
-*port:* the port number.
+
+**path:** | the director that you want to share.
+--|--|--
+**localhost:** | the ip address that you pc.
+**port:** | the port number.
 
 for example:
 
