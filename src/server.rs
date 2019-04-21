@@ -1,7 +1,9 @@
 pub mod config;
 
+use std::env;
 use std::fmt::Write;
-use std::path::Path;
+use std::path::{ Path, Component };
+use std::net::Ipv4Addr;
 use std::path::PathBuf;
 
 use actix_web::{ Result, HttpRequest, HttpResponse, fs, App, middleware, server };
@@ -50,7 +52,6 @@ fn directory_displayer<S>(dir: &fs::Directory, req: &HttpRequest<S>) -> Result<H
 fn configure_app(app: App<config::Config>) -> App<config::Config> {
     let s = {
         let path = &app.state().path;
-        println!("path = {}", path.to_str().unwrap());
         if path.is_file() {
             None
         } else {
@@ -75,16 +76,19 @@ fn configure_app(app: App<config::Config>) -> App<config::Config> {
 pub fn start_server() {
     let sys = actix::System::new("simple-http-server");
 
-    let config = config::Config{
-        path: PathBuf::from("D://")
-    };
+    let cur = Path::new("config.json");
+    let cur = env::current_dir().unwrap().join(cur);
+    println!("CurDir={:?}", cur.display());
 
+    let config = config::read_config_from_file(cur).unwrap();
+
+    let inside_config = config.clone();
     let _server = server::new(move || {
-        App::with_state(config.clone())
+        App::with_state(inside_config.clone())
             .middleware(middleware::Logger::default())
             .configure(configure_app)
     })
-    .bind("127.0.0.1:8080")
+    .bind(format!("{}:{}", config.localhost, config.port))
     .unwrap()
     .run();
 
